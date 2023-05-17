@@ -5,7 +5,7 @@ let boton=document.querySelector('#boton');
 boton.addEventListener('click', ()=>{
     let busqueda=buscador.value;
     console.log(busqueda);
-    api(busqueda);
+    api1(busqueda);
 })
 
 
@@ -16,24 +16,16 @@ const options = {
 		'X-RapidAPI-Host': 'youtube138.p.rapidapi.com'
 	}
 };
+async function api1(val) {
+    const response = await fetch(`https://youtube138.p.rapidapi.com/search/?q=${val}&hl=en&gl=US`, options);
+        const result = await response.json();
+        api(result.contents[0].video.videoId)
+}
 
 /*se inician los procesos */
-async function api(val) {
+async function api(id) {
     try {
-        const response = await fetch(`https://youtube138.p.rapidapi.com/search/?q=${val}&hl=en&gl=US`, options);
-        const result = await response.json();
-        let videoxxx=result.contents[0].video
-        let nombreCanal=document.querySelector('#nombreCanal')
-        let nombreTitulo=document.querySelector('#nombreTitulo')
-        let iframevideo=document.querySelector('#iframevideo')
-        let imagenLogo=document.querySelector('#imagenLogo')
-        
-        iframevideo.src=`https://www.youtube.com/embed/${videoxxx.videoId}`
-        nombreCanal.innerHTML=videoxxx.author.title;
-        nombreTitulo.innerHTML=videoxxx.title;
-        imagenLogo.src=videoxxx.author.avatar[0].url;
-
-        const url2 = await fetch(`https://youtube138.p.rapidapi.com/video/details/?id=${videoxxx.videoId}&hl=en&gl=US`,options);
+        const url2 = await fetch(`https://youtube138.p.rapidapi.com/video/details/?id=${id}&hl=en&gl=US`,options);
         const result2 = await url2.json();
         let estatusxxx= result2.stats
         let visualizacion=document.querySelector('#visualizacion')
@@ -44,9 +36,21 @@ async function api(val) {
         visualizacion.innerHTML=estatusxxx.views;
         likes.innerHTML=estatusxxx.likes;
         cantidadComentarios.innerHTML=estatusxxx.comments;
-        description.innerHTML=result2.description;
+        description.innerHTML=result2.description; 
 
-        const url3 = await fetch(`https://youtube138.p.rapidapi.com/video/comments/?id=${videoxxx.videoId}&hl=en&gl=US`,options);
+
+        let videoxxx=result2
+        let nombreCanal=document.querySelector('#nombreCanal')
+        let nombreTitulo=document.querySelector('#nombreTitulo')
+        let iframevideo=document.querySelector('#iframevideo')
+        let imagenLogo=document.querySelector('#imagenLogo')
+        
+        iframevideo.src=`https://www.youtube.com/embed/${videoxxx.videoId}`
+        nombreCanal.innerHTML=videoxxx.author.title;
+        nombreTitulo.innerHTML=videoxxx.title;
+        imagenLogo.src=videoxxx.author.avatar[0].url;
+
+        const url3 = await fetch(`https://youtube138.p.rapidapi.com/video/comments/?id=${id}&hl=en&gl=US`,options);
         const result3 = await url3.json();
 
         let com=document.getElementById('usuarios');
@@ -60,7 +64,32 @@ async function api(val) {
         } else {
             box = '<li>No hay comentarios disponibles</li>';
         }
-          com.innerHTML = box;
+        com.innerHTML = box;
+
+        
+        const url4 = await fetch( `https://youtube138.p.rapidapi.com/video/related-contents/?id=${id}&hl=en&gl=US`,options);
+        const result4 = await url4.json();
+        let vidRel=document.getElementById('container_videos_relacionados')
+        console.log(result4.contents)
+        vidRel.innerHTML='';
+        result4.contents.forEach(element => {
+            console.log(element)
+            if (element.type!='video') return;
+            let str=
+            `
+            <div class="video_relacionado">
+                <img class="vidRelacionados" id="${element.video.videoId}" height="100%" width="100%" src="${element.video.thumbnails[0].url}" alt="">
+            </div>
+            `;
+            vidRel.insertAdjacentHTML('beforeend',str);
+        })
+        let vidRelacionados=document.querySelectorAll('.vidRelacionados');
+        vidRelacionados.forEach(element => {
+            element.addEventListener('click',()=>{
+                api(element.id)
+            })
+        })
+        
 
     } catch (error) {
         console.error(error);
