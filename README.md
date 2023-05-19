@@ -3,8 +3,8 @@
 #### Utilización
 
 La pagina se utiliza a partir de una búsqueda del titulo del video deseado y al darle al botón automáticamente se mostraran los diferentes elementos de la pagina.
+![imgbusqueda](https://github.com/HackkQueen/youtubeMafe/assets/113302644/c4e20543-f9b8-494f-bd35-b17ea56a4bbe)
 
-![](C:\Users\marif\youtubeMafe\img\imgbusqueda.jpg)
 
 #### API
 
